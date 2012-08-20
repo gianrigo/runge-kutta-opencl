@@ -5,7 +5,7 @@ int main() {
   int **M, i, j;
 
   /* Initializing the Matrix. */  
-  M = (int**) malloc(5*sizeof(int));
+  M = (int**) malloc(3*sizeof(int*));
   for(i=0; i < 3; i++)
     M[i] = (int*) malloc(3*sizeof(int));  
 
