@@ -108,7 +108,7 @@ void opencl_create_program(char* program_path){
 void opencl_create_kernel(char* kernel_name){
   cl_int err;
 
-  kernel = clCreateKernel( program, "matrixmulti", &err);
+  kernel = clCreateKernel( program, kernel_name, &err);
   if ( kernel == NULL ){
     printf("\nERROR: Failed to create kernel %s.\n",kernel_name);
     exit(-1);
