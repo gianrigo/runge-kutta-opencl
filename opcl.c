@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "opcl.h"
 
-#define TYPE int
+#define TYPE float
 
 /* Objetos do Open CL */
 cl_platform_id platform;
