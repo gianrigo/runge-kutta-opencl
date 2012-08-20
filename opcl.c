@@ -15,15 +15,15 @@ cl_mem opclMatrixA, opclMatrixB, opclMatrixC;
 unsigned int devices_found;
 unsigned int device_used = 0;
 
-unsigned int opencl_create_platform(unsigned int num_platfor3){
-  int num_platfor3_found;
+unsigned int opencl_create_platform(unsigned int num_platforms){
+  int num_platforms_found;
   
-  clGetPlatformIDs( 0, NULL, (cl_uint*)&num_platfor3_found);
-  if ( clGetPlatformIDs( num_platfor3, &platform, (cl_uint*)&num_platfor3_found ) != CL_SUCCESS ){
+  clGetPlatformIDs( 0, NULL, (cl_uint*)&num_platforms_found);
+  if ( clGetPlatformIDs( num_platforms, &platform, (cl_uint*)&num_platforms_found ) != CL_SUCCESS ){
     printf("\nERROR: Failed to create plataform.\n");
     exit(-1);
   }
-  return num_platfor3_found;
+  return num_platforms_found;
 }
 
 unsigned int opencl_get_devices_id(cl_device_type device_type) {
@@ -171,11 +171,11 @@ int opencl_run_kernel(int /***/**Matriz) {
 }
 
 void opencl_init(int /***/**minhaMatriz){
-  unsigned int num_platfor3, num_devices;
+  unsigned int num_platforms, num_devices;
 
   printf("Starting OpenCL platform...");
-  num_platfor3 =  opencl_create_platform(2); 
-  printf(" Num Platforms = %d OK.\n", num_platfor3);
+  num_platforms =  opencl_create_platform(2); 
+  printf(" Num Platforms = %d OK.\n", num_platforms);
    
   printf("Searching for devices...");
   num_devices = opencl_get_devices_id(CL_DEVICE_TYPE_GPU);
