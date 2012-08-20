@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "opcl.h"
 
+#define TYPE int
+
 /* Objetos do Open CL */
 cl_platform_id platform;
 cl_context context;
@@ -117,7 +119,8 @@ void opencl_create_kernel(char* kernel_name){
 
 /********************** ALTERAR ************************/
 void prepare_kernel(int tam){
-  int MatrixA[3][3], MatrixB[3][3], i, j, size;
+  TYPE MatrixA[3][3], MatrixB[3][3];
+  int i, j, size;
   cl_mem matrix_size;
 
   for ( i = 0; i < 3; i++ ) {
@@ -129,9 +132,9 @@ void prepare_kernel(int tam){
   size = 3;
 
   /* Criação dos buffers que o OpenCL vai usar. */
-  opclMatrixA = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int)*tam*tam, MatrixA, NULL);
-  opclMatrixB = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int)*tam*tam, MatrixB, NULL);
-  opclMatrixC = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(int)*tam*tam, NULL, NULL);
+  opclMatrixA = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*tam*tam, MatrixA, NULL);
+  opclMatrixB = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*tam*tam, MatrixB, NULL);
+  opclMatrixC = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(TYPE)*tam*tam, NULL, NULL);
   matrix_size = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&size), NULL);
 
   clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&opclMatrixA);
@@ -142,17 +145,17 @@ void prepare_kernel(int tam){
   clFinish(queue);
 }
 
-void opencl_run_kernel(int **Matriz, int size) {
+void opencl_run_kernel(TYPE **Matriz, int size) {
   size_t work_dim[2] = { 3, 3 };
-  int Mc[3][3], i, j;
+  TYPE Mc[3][3];
+  int i, j;
   
   prepare_kernel(size);
   clEnqueueNDRangeKernel(queue, kernel, 2, NULL, work_dim, NULL, 0, NULL, &event);
   clReleaseEvent(event);
   clFinish(queue);
-
-  if( clEnqueueReadBuffer(queue, opclMatrixC, CL_TRUE, 0, sizeof(int)*size*size, &Mc, 0, NULL, &event) == CL_INVALID_VALUE )
-    printf("ERRROROOO\n");
+  if( clEnqueueReadBuffer(queue, opclMatrixC, CL_TRUE, 0, sizeof(TYPE)*size*size, &Mc, 0, NULL, &event) == CL_INVALID_VALUE )
+    printf("\nERROR: Failed to read buffer.\n");
   clReleaseEvent(event);
 
   for( i = 0; i < size; i++ )
@@ -160,7 +163,7 @@ void opencl_run_kernel(int **Matriz, int size) {
       Matriz[i][j] = Mc[i][j];
 }
 
-void opencl_init(char* kernel_name, int **minhaMatriz, int size){
+void opencl_init(char* kernel_name, TYPE **minhaMatriz, int size){
   unsigned int num_platforms, num_devices;
 
   printf("Starting OpenCL platform...");

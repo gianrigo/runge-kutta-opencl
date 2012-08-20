@@ -2,7 +2,8 @@
 #include "opcl.h"
 
 int main() {
-  int **M, i, j, size;
+  int **M;
+  int i, j, size;
 
   size = 3;
 
