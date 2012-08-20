@@ -116,7 +116,7 @@ void opencl_create_kernel(char* kernel_name){
 }
 
 /********************** ALTERAR ************************/
-void prepare_kernel() {
+void prepare_kernel(int tam){
   int MatrixA[3][3], MatrixB[3][3], i, j, size;
   cl_mem matrix_size;
 
@@ -129,9 +129,9 @@ void prepare_kernel() {
   size = 3;
 
   /* Criação dos buffers que o OpenCL vai usar. */
-  opclMatrixA = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int)*3*3, MatrixA, NULL);
-  opclMatrixB = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int)*3*3, MatrixB, NULL);
-  opclMatrixC = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(int)*3*3, NULL, NULL);
+  opclMatrixA = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int)*tam*tam, MatrixA, NULL);
+  opclMatrixB = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int)*tam*tam, MatrixB, NULL);
+  opclMatrixC = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(int)*tam*tam, NULL, NULL);
   matrix_size = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&size), NULL);
 
   clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&opclMatrixA);
@@ -142,35 +142,25 @@ void prepare_kernel() {
   clFinish(queue);
 }
 
-int opencl_run_kernel(int /***/**Matriz) {
+void opencl_run_kernel(int **Matriz, int size) {
   size_t work_dim[2] = { 3, 3 };
   int Mc[3][3], i, j;
   
-  //*Matriz = (int **) malloc(3*3*sizeof(int *));
-  
-  
-  prepare_kernel();
+  prepare_kernel(size);
   clEnqueueNDRangeKernel(queue, kernel, 2, NULL, work_dim, NULL, 0, NULL, &event);
   clReleaseEvent(event);
   clFinish(queue);
 
-  if( clEnqueueReadBuffer(queue, opclMatrixC, CL_TRUE, 0, sizeof(int)*3*3, &Mc, 0, NULL, &event) == CL_INVALID_VALUE )
+  if( clEnqueueReadBuffer(queue, opclMatrixC, CL_TRUE, 0, sizeof(int)*size*size, &Mc, 0, NULL, &event) == CL_INVALID_VALUE )
     printf("ERRROROOO\n");
   clReleaseEvent(event);
 
-  for( i = 0; i < 3; i++ ) {
-    for( j = 0; j< 3; j++ ) {
-     /* printf("%d  ", Mc[i][j]);
-      printf(">%d %d\n", i,j);*/
+  for( i = 0; i < size; i++ )
+    for( j = 0; j< size; j++ )
       Matriz[i][j] = Mc[i][j];
-    }
-    //printf("\n");
-  }
-
-  return 1;
 }
 
-void opencl_init(int /***/**minhaMatriz){
+void opencl_init(char* kernel_name, int **minhaMatriz, int size){
   unsigned int num_platforms, num_devices;
 
   printf("Starting OpenCL platform...");
@@ -194,11 +184,11 @@ void opencl_init(int /***/**minhaMatriz){
   printf(" OK.\n");
 
   printf("Creating kernel...");
-  opencl_create_kernel((char*)"matrixmulti");
+  opencl_create_kernel(kernel_name);
   printf(" OK.\n");
 
   printf("Running the kernel...");
-  opencl_run_kernel(minhaMatriz);
+  opencl_run_kernel(minhaMatriz,size);
   printf(" OK.\n");
 }
 
