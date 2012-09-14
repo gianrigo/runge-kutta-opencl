@@ -117,11 +117,10 @@ void opencl_create_kernel(char* kernel_name){
 
 /********************** ALTERAR ************************/
 void prepare_kernel(int tam){
-  TYPE v0[3][3], field[3][3];
-  int i, j, size, count_v0, max_points;
+  TYPE v0[3][3], field[3][3], points[3][3], n_points[3][3];
+  int i, j, count_v0, max_points, n_x, n_y, n_z;
   double h;
-  cl_mem matrix_size;
-  cl_mem opencl_count_v0, opencl_h, opencl_n_x, opencl_n_y, opencl_n_z;
+  cl_mem opencl_count_v0, opencl_h, opencl_n_x, opencl_n_y, opencl_n_z, opencl_max_points;
 
   for ( i = 0; i < 3; i++ ){
     for ( j = 0; j < 3; j++ ){
