@@ -9,7 +9,7 @@ cl_command_queue queue;
 cl_kernel kernel;
 cl_program program;
 cl_event event;
-cl_mem opclMatrixA, opclMatrixB, opclMatrixC;
+cl_mem opencl_v0, opencl_field, opencl_points, opencl_n_points;
 
 /* Informações sobre os devices */
 unsigned int devices_found;
@@ -117,28 +117,47 @@ void opencl_create_kernel(char* kernel_name){
 
 /********************** ALTERAR ************************/
 void prepare_kernel(int tam){
-  TYPE MatrixA[3][3], MatrixB[3][3];
-  int i, j, size;
+  TYPE v0[3][3], field[3][3];
+  int i, j, size, count_v0, max_points;
+  double h;
   cl_mem matrix_size;
+  cl_mem opencl_count_v0, opencl_h, opencl_n_x, opencl_n_y, opencl_n_z;
 
-  for ( i = 0; i < 3; i++ ) {
-    for ( j = 0; j < 3; j++ ) {
-      MatrixA[i][j] = i+j;
-      MatrixB[i][j] = 2;
+  for ( i = 0; i < 3; i++ ){
+    for ( j = 0; j < 3; j++ ){
+      v0[i][j] = i+j;
+      field[i][j] = 2;
+      points[i][j] = 3;
+      n_points[i][j] = 4;
     }
   }
-  size = 3;
+  n_x = n_y = n_z = 3;
+  count_v0 = 3;
+  h = 0.01;
+  max_points = 3;
 
   /* Criação dos buffers que o OpenCL vai usar. */
-  opclMatrixA = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*tam*tam, MatrixA, NULL);
-  opclMatrixB = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*tam*tam, MatrixB, NULL);
-  opclMatrixC = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(TYPE)*tam*tam, NULL, NULL);
-  matrix_size = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&size), NULL);
+  opencl_v0 = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*tam*tam, v0, NULL);
+  opencl_count_v0 = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&count_v0), NULL);
+  opencl_h = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(double), (&h), NULL);
+  opencl_n_x = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&n_x), NULL);
+  opencl_n_y = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&n_y), NULL);
+  opencl_n_z = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&n_z), NULL);  
+  opencl_field = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*tam*tam, field, NULL);
+  opencl_points = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*tam*tam, points, NULL);
+  opencl_n_points = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*tam*tam, n_points, NULL);
+  opencl_max_points = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&max_points), NULL);
 
-  clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&opclMatrixA);
-  clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&opclMatrixB);
-  clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&opclMatrixC);
-  clSetKernelArg(kernel, 3, sizeof(cl_mem), (void *)&matrix_size);
+  clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&opencl_v0);
+  clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&opencl_count_v0);
+  clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&opencl_h);
+  clSetKernelArg(kernel, 3, sizeof(cl_mem), (void *)&opencl_n_x);
+  clSetKernelArg(kernel, 4, sizeof(cl_mem), (void *)&opencl_n_y);
+  clSetKernelArg(kernel, 5, sizeof(cl_mem), (void *)&opencl_n_z);
+  clSetKernelArg(kernel, 6, sizeof(cl_mem), (void *)&opencl_field);
+  clSetKernelArg(kernel, 7, sizeof(cl_mem), (void *)&opencl_points);
+  clSetKernelArg(kernel, 8, sizeof(cl_mem), (void *)&opencl_n_points);
+  clSetKernelArg(kernel, 9, sizeof(cl_mem), (void *)&opencl_max_points);
 
   clFinish(queue);
 }
@@ -152,7 +171,7 @@ void opencl_run_kernel(TYPE **Matriz, int size) {
   clEnqueueNDRangeKernel(queue, kernel, 2, NULL, work_dim, NULL, 0, NULL, &event);
   clReleaseEvent(event);
   clFinish(queue);
-  if( clEnqueueReadBuffer(queue, opclMatrixC, CL_TRUE, 0, sizeof(TYPE)*size*size, &Mc, 0, NULL, &event) == CL_INVALID_VALUE )
+  if( clEnqueueReadBuffer(queue, opencl_n_points, CL_TRUE, 0, sizeof(TYPE)*size*size, &Mc, 0, NULL, &event) == CL_INVALID_VALUE )
     printf("\nERROR: Failed to read buffer.\n");
   clReleaseEvent(event);
 
