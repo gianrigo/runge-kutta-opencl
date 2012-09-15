@@ -119,7 +119,7 @@ void opencl_create_kernel(char* kernel_name){
 void prepare_kernel(int tam){
   TYPE v0[3][3], field[3][3], points[3][3];
   int i, j, count_v0, max_points, n_x, n_y, n_z;
-  double h;
+  float h;
   cl_mem opencl_count_v0, opencl_h, opencl_n_x, opencl_n_y, opencl_n_z, opencl_max_points;
 
   for ( i = 0; i < 3; i++ ){
@@ -137,7 +137,7 @@ void prepare_kernel(int tam){
   /* Criação dos buffers que o OpenCL vai usar. */
   opencl_v0 = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*tam*tam, v0, NULL);
   opencl_count_v0 = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&count_v0), NULL);
-  opencl_h = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(double), (&h), NULL);
+  opencl_h = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float), (&h), NULL);
   opencl_n_x = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&n_x), NULL);
   opencl_n_y = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&n_y), NULL);
   opencl_n_z = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&n_z), NULL);  
@@ -156,16 +156,6 @@ void prepare_kernel(int tam){
   clSetKernelArg(kernel, 7, sizeof(cl_mem), (void *)&opencl_points);
   clSetKernelArg(kernel, 8, sizeof(cl_mem), (void *)&opencl_n_points);
   clSetKernelArg(kernel, 9, sizeof(cl_mem), (void *)&opencl_max_points);
-
-  /*opencl_v0 = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int)*tam*tam, v0, NULL);
-  opencl_field = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int)*tam*tam, field, NULL);
-  opencl_n_points = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(int)*tam*tam, NULL, NULL);
-  opencl_max_points = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&max_points), NULL);
-
-  clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&opencl_v0);
-  clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&opencl_field);
-  clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&opencl_n_points);
-  clSetKernelArg(kernel, 3, sizeof(cl_mem), (void *)&opencl_max_points);*/
 
   clFinish(queue);
 }
