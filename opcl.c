@@ -142,7 +142,7 @@ void prepare_kernel(int tam){
   opencl_n_y = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&n_y), NULL);
   opencl_n_z = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&n_z), NULL);  
   opencl_field = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*tam*tam, field, NULL);
-  opencl_points = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*tam*tam, points, NULL);
+  opencl_points = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*tam*tam, points, NULL);
   opencl_n_points = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(TYPE)*tam*tam, NULL,NULL);
   opencl_max_points = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&max_points), NULL);
 
@@ -160,9 +160,9 @@ void prepare_kernel(int tam){
   clFinish(queue);
 }
 
-void opencl_run_kernel(TYPE **Matriz, int size) {
+void opencl_run_kernel(TYPE **Matriz, TYPE **Matriz2, int size) {
   size_t work_dim[2] = { 3, 3 };
-  TYPE Mc[3][3];
+  TYPE Mc[3][3], npts[3][3];
   int i, j;
   
   prepare_kernel(size);
@@ -171,14 +171,19 @@ void opencl_run_kernel(TYPE **Matriz, int size) {
   clFinish(queue);
   if( clEnqueueReadBuffer(queue, opencl_n_points, CL_TRUE, 0, sizeof(TYPE)*size*size, &Mc, 0, NULL, &event) == CL_INVALID_VALUE )
     printf("\nERROR: Failed to read buffer.\n");
+  if( clEnqueueReadBuffer(queue, opencl_points, CL_TRUE, 0, sizeof(TYPE)*size*size, &npts, 0, NULL, &event) == CL_INVALID_VALUE )
+    printf("\nERROR: Failed to read buffer.\n");
   clReleaseEvent(event);
 
-  for( i = 0; i < size; i++ )
-    for( j = 0; j< size; j++ )
+  for( i = 0; i < size; i++ ){
+    for( j = 0; j< size; j++ ){
       Matriz[i][j] = Mc[i][j];
+      Matriz2[i][j] = npts[i][j];
+    }
+  }
 }
 
-void opencl_init(char* kernel_name, TYPE **minhaMatriz, int size){
+void opencl_init(char* kernel_name, TYPE **Matriz, TYPE **Matriz2, int size){
   unsigned int num_platforms, num_devices;
 
   printf("Starting OpenCL platform...");
@@ -206,7 +211,7 @@ void opencl_init(char* kernel_name, TYPE **minhaMatriz, int size){
   printf(" OK.\n");
 
   printf("Running the kernel...");
-  opencl_run_kernel(minhaMatriz,size);
+  opencl_run_kernel(Matriz,Matriz2,size);
   printf(" OK.\n");
 }
 

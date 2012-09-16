@@ -8,4 +8,5 @@ __kernel void matrixmulti(__global float* v0, __global int *count_v0, __global f
     for( i = 0; i < (*max_points); i++ ) {
       n_points[row+column] += v0[row+i]*field[column+i*(*max_points)];
     }
+    points[row+column] += 1;
 }

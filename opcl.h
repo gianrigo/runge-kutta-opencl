@@ -9,4 +9,4 @@
   #define TYPE float
 #endif
 
-void opencl_init(char*, float **, int);
+void opencl_init(char*, TYPE **, TYPE **,  int);
