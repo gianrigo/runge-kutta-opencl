@@ -145,30 +145,21 @@ void prepare_kernel(TYPE* v0, int count_v0, TYPE h, int n_x,int n_y,int n_z, TYP
   clFinish(queue);
 }
 
-void opencl_run_kernel(TYPE *Matriz, TYPE *Matriz2, int size) {
+void opencl_run_kernel(TYPE *points, TYPE *n_points, int max_points){
   size_t work_dim[2] = { 3,3 };
-  TYPE Mc[3][3], npts[3][3];
-  int i, j;
   
   clEnqueueNDRangeKernel(queue, kernel, 2, NULL, work_dim, NULL, 0, NULL, &event);
   clReleaseEvent(event);
   clFinish(queue);
-  if( clEnqueueReadBuffer(queue, opencl_n_points, CL_TRUE, 0, sizeof(TYPE)*size*size, &Mc, 0, NULL, &event) == CL_INVALID_VALUE ){
+  if( clEnqueueReadBuffer(queue, opencl_n_points, CL_TRUE, 0, sizeof(TYPE)*max_points, n_points, 0, NULL, &event) == CL_INVALID_VALUE ){
     printf("\nERROR: Failed to read buffer.\n");
     exit(-1);
   }
-  if( clEnqueueReadBuffer(queue, opencl_points, CL_TRUE, 0, sizeof(TYPE)*size*size, &npts, 0, NULL, &event) == CL_INVALID_VALUE ){
+  if( clEnqueueReadBuffer(queue, opencl_points, CL_TRUE, 0, sizeof(TYPE)*max_points, points, 0, NULL, &event) == CL_INVALID_VALUE ){
     printf("\nERROR: Failed to read buffer.\n");
     exit(-1);
   }
   clReleaseEvent(event);
-
-  for( i = 0; i < size; i++ ){
-    for( j = 0; j< size; j++ ){
-      Matriz[i*size+j] = Mc[i][j];
-      Matriz2[i*size+j] = npts[i][j];
-    }
-  }
 }
 
 void opencl_init(char* kernel_name, TYPE* v0, int count_v0, TYPE h, int n_x,int n_y,int n_z, TYPE *field, TYPE *points, TYPE* n_points, int max_points){
