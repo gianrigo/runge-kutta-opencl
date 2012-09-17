@@ -3,10 +3,10 @@ __kernel void matrixmulti(__global float* v0, __global int *count_v0, __global f
     unsigned int row = get_global_id(0);
     unsigned int column = get_global_id(1);
     unsigned i;
-    row *= (*max_points);
+    row *= (*n_x);
     n_points[row+column] = 0;
-    for( i = 0; i < (*max_points); i++ ) {
-      n_points[row+column] += v0[row+i]*field[column+i*(*max_points)];
+    for( i = 0; i < (*n_x); i++ ) {
+      n_points[row+column] += v0[row+i]*field[column+i*(*n_x)];
     }
     points[row+column] += 1;
 }
