@@ -9,4 +9,12 @@
   #define TYPE float
 #endif
 
-void opencl_init(char*, TYPE*, int, TYPE, int, int, int, TYPE*, TYPE*, TYPE*, int);
+typedef struct{
+ float x;
+ float y;
+ float z;
+}teste;
+
+
+
+void opencl_init(char*, TYPE*, int, TYPE, int, int, int, teste*, TYPE*, TYPE*, int);
