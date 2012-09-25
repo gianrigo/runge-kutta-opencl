@@ -118,12 +118,6 @@ void opencl_create_kernel(char* kernel_name){
 void prepare_kernel(TYPE* v0, int count_v0, TYPE h, int n_x,int n_y,int n_z, teste *field, TYPE *points, TYPE* n_points, int max_points){
   cl_mem opencl_count_v0, opencl_h, opencl_n_x, opencl_n_y, opencl_n_z, opencl_max_points;
 
-  teste t;
-
-  t.x = 1.0;
-  t.y = 50.0;
-  t.z = 2.5;
-
   /* Criação dos buffers que o OpenCL vai usar. */
   opencl_v0 = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(TYPE)*count_v0, v0, NULL);
   opencl_count_v0 = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int), (&count_v0), NULL);
@@ -151,9 +145,10 @@ void prepare_kernel(TYPE* v0, int count_v0, TYPE h, int n_x,int n_y,int n_z, tes
 }
 
 void opencl_run_kernel(TYPE *points, TYPE *n_points, int max_points){
-  size_t work_dim[3] = { 3,3, 3 }; /*ALTERAR*/
+  size_t work_dim[1];
   
-  clEnqueueNDRangeKernel(queue, kernel, 3, NULL, work_dim, NULL, 0, NULL, &event);
+  work_dim[0] = max_points;
+  clEnqueueNDRangeKernel(queue, kernel, 1, NULL, work_dim, NULL, 0, NULL, &event);
   clReleaseEvent(event);
   clFinish(queue);
   if( clEnqueueReadBuffer(queue, opencl_n_points, CL_TRUE, 0, sizeof(TYPE)*max_points, n_points, 0, NULL, &event) == CL_INVALID_VALUE ){

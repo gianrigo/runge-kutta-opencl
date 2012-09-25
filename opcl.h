@@ -15,6 +15,4 @@ typedef struct{
  float z;
 }teste;
 
-
-
 void opencl_init(char*, TYPE*, int, TYPE, int, int, int, teste*, TYPE*, TYPE*, int);

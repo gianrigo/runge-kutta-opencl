@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "opcl.h"
+#include "rk.h"
 
 int main(){
   TYPE *v0, h, *points, *n_points;
@@ -36,7 +36,7 @@ int main(){
 }
 
 
-  opencl_init((char*)"matrixmulti", v0, count_v0, h, n_x, n_y, n_z,field, points, n_points, max_points);
+  rk2(v0, count_v0, h, n_x, n_y, n_z,field, points, n_points, max_points);
 
   /* Validating the results. */
   for( i = 0; i < 27; i++ ){
@@ -51,7 +51,7 @@ int main(){
       printf("\n");      
     printf("%f  ", points[i]);
   }
-
+  printf("\n"); 
   free(v0);
   free(field);
   free(points);
