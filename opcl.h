@@ -9,10 +9,12 @@
   #define TYPE float
 #endif
 
-typedef struct{
- float x;
- float y;
- float z;
-}teste;
+typedef struct vec{
+  TYPE x;
+  TYPE y;
+  TYPE z;
+} vector;
 
-void opencl_init(char*, TYPE*, int, TYPE, int, int, int, teste*, TYPE*, TYPE*, int);
+typedef vector *vector_field;
+
+void opencl_init(char*, vector*, int, TYPE, int, int, int, vector_field field, vector*, int*, int);

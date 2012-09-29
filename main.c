@@ -2,9 +2,11 @@
 #include "rk.h"
 
 int main(){
-  TYPE *v0, h, *points, *n_points;
-  teste *field;
-  int i, j, k, count_v0, n_x, n_y, n_z, max_points;
+  vector *v0, *points; 
+  TYPE h;
+  int *n_points;
+  vector_field field;
+  int i,  count_v0, n_x, n_y, n_z, max_points;
 
   n_x = n_y = n_z = 3;
   count_v0 = 27;
@@ -12,44 +14,37 @@ int main(){
   max_points = 27;
 
   /* Initializing the Matrix. */  
-  v0 = (TYPE*) malloc(count_v0*sizeof(TYPE));
-  field = (teste*) malloc(n_x*n_y*n_y*sizeof(teste));
-  points = (TYPE*) malloc(max_points*sizeof(TYPE));
-  n_points = (TYPE*) malloc(max_points*sizeof(TYPE));
+  v0 = (vector*) malloc(count_v0*sizeof(vector));
+  field = (vector_field) malloc(n_x*n_y*n_y*sizeof(vector));
+  points = (vector*) malloc(max_points*sizeof(vector));
+  n_points = (int*) malloc(max_points*sizeof(int));
 
-  for( i = 0; i < 27; i++ ){
-        v0[i] = i;
+  for( i = 0; i < max_points; i++ ){
+        v0[i].x = i;
+        v0[i].y = i;
+        v0[i].z = i;
         field[i].x = 2;
         field[i].y = 2;
         field[i].z = 2;
-        points[i] = 3;
+        points[i].x = 3;
+        points[i].y = 3;
+        points[i].z = 3;
   }
-
- for( i = 0; i < 3; i++ ){
-    for( j = 0; j < 3; j++ ){
-      for( k = 0; k < 3; k++ ){
-    if( k % 3 == 0)
-      printf("\n");      
-    printf("%f  ", v0[i*3*3+j*3+k]);
-  }
-}
-}
-
 
   rk2(v0, count_v0, h, n_x, n_y, n_z,field, points, n_points, max_points);
 
   /* Validating the results. */
-  for( i = 0; i < 27; i++ ){
+  for( i = 0; i < max_points; i++ ){
     if( i % 3 == 0)
       printf("\n");      
-    printf("%f  ", n_points[i]);
+    printf("%d  ", n_points[i]);
   }
   
   printf("\n");
-  for( i = 0; i < 27; i++ ){
+  for( i = 0; i < max_points; i++ ){
     if( i % 3 == 0)
       printf("\n");      
-    printf("%f  ", points[i]);
+    printf("(%f, %f, %f) ", points[i].x, points[i].y, points[i].z);
   }
   printf("\n"); 
   free(v0);
